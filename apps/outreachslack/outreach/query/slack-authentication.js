@@ -1,33 +1,30 @@
-"use strict";
-const CryptoJS = require("crypto-js");
-const config = require("../../config/config");
+'use strict';
+const CryptoJS = require('crypto-js');
+const config = require('../../config/config');
+const { getAuthInfo } = require('../../utilities/utils');
 
 const querySlackAuthentication = async (slackUserId) => {
-  try {
-    // TODO get the slack user id info from DB. For now populating with dummy values
-    const records = [
-      {
-        accessToken: "123adnewkjncwkncw",
-        refreshToken: "ckmrwlcmowrco1234",
-      },
-    ];
-
-    const result = [...records];
-
-    if (result.records.length > 0) {
-      result.records[0].accessToken = CryptoJS.AES.decrypt(
-        result.records[0].accessToken,
-        config.slack.aesKey
-      ).toString(CryptoJS.enc.Utf8);
-      result.records[0].refreshToken = CryptoJS.AES.decrypt(
-        result.records[0].refreshToken,
-        config.slack.aesKey
-      ).toString(CryptoJS.enc.Utf8);
+    try {
+        // TODO get the slack user id info from DB. For now populating with dummy values
+        const authInfo = getAuthInfo(slackUserId);
+        console.log("authInfo: ", authInfo);
+        const result = {};
+        if (authInfo) {
+            result.accessToken = CryptoJS.AES.decrypt(
+                authInfo.accessToken,
+                config.slack.aesKey
+            ).toString(CryptoJS.enc.Utf8);
+            result.refreshToken = CryptoJS.AES.decrypt(
+                authInfo.refreshToken,
+                config.slack.aesKey
+            ).toString(CryptoJS.enc.Utf8);
+            result.tokenType = authInfo.tokenType
+        }
+        console.log("result: ", result);
+        return result;
+    } catch (e) {
+        throw new Error(e.message);
     }
-    return result;
-  } catch (e) {
-    throw new Error(e.message);
-  }
 };
 
 module.exports = { querySlackAuthentication };

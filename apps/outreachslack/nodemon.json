@@ -1,6 +1,6 @@
 {
-    "watch": ["src/*.js"],
+    "watch": ["*.js"],
     "ext": "js",
-    "exec": "node src/app.js"
+    "exec": "node app.js"
   }
   

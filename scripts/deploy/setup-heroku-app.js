@@ -118,6 +118,8 @@ const setupHerokuApp = () => {
         { silent: true }
     );
     sh.cd('../../');
+    log(`App Name: ${sh.env.HEROKU_APP_NAME} and current branch: ${sh.env.CURRENT_BRANCH}`)
+    log(`git push https://git.heroku.com/${sh.env.HEROKU_APP_NAME}.git ${sh.env.CURRENT_BRANCH}:main`);
     sh.exec(
         `git push https://git.heroku.com/${sh.env.HEROKU_APP_NAME}.git ${sh.env.CURRENT_BRANCH}:main`
     );

@@ -19,10 +19,11 @@ const startOAuthProcess = async (req, res) => {
 
 // Returns OAuth URL to start Web based OAuth 2.0 flow
 const _buildOAuthURL = () => {
-    let auth_url = `${process.env.OUTREACH_LOGIN_URL}/connect/authorize`;
+    let auth_url = `${process.env.OUTREACH_LOGIN_URL}/oauth/authorize`;
     auth_url += `?client_id=${process.env.OUTREACH_CLIENT_ID}`;
     auth_url += `&redirect_uri=${process.env.HEROKU_URL}/oauthcallback`;
-    auth_url += '&response_type=code';
+    auth_url += '&response_type=code&scope=tasks.read';
+    console.log("auth_url: ", auth_url);
     return auth_url;
 };
 
@@ -32,4 +33,4 @@ const oauthStart = {
     handler: startOAuthProcess
 };
 
-module.exports = { oauthStart };
+module.exports = { oauthStart, startOAuthProcess };

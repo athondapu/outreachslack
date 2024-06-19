@@ -1,6 +1,7 @@
 const { addProfile, getProfile } = require("../utilities");
 
 module.exports = async ({ payload, context, next, client }) => {
+  console.log("Payload: ", payload);
   try {
     const { user } = payload;
     if (user) {

@@ -86,19 +86,19 @@ boltApp.use(authWithOutreach);
 
 // Asynchronous function to start the app
 (async () => {
+    const port = process.env.PORT || 3000;
     try {
-        console.log('process.env.PORT: ', process.env.PORT);
         // Start your app
-        await boltApp.start(process.env.PORT || 3000);
+        await boltApp.start(port);
         console.log(
-            `⚡️ Bolt app is running on port ${process.env.PORT || 3000}!`
+            `⚡️ Bolt app is running on port ${port}!`
         );
     } catch (error) {
         console.error('Unable to start App', error);
         process.exit(1);
     }
 
-    app.listen(9000, () => {
-        console.log(`Example app listening on port 9000`);
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`);
     });
 })();

@@ -24,7 +24,7 @@ const fetchOAuthToken = async (req, res) => {
             // Request Access and Refresh tokens
             const authInfo = await _requestAccessAndRefreshTokens(code);
 
-            // Upsert record in Salesforce
+            // Upsert record in Outreach
             console.log(
                 'Correctly authorized, Storying tokens in Outreach: ',
                 authInfo
@@ -77,7 +77,7 @@ const fetchOAuthToken = async (req, res) => {
     } catch (e) {
         console.error(e);
         res.writeHead(500);
-        res.end('Failed to connect to Salesforce', 'utf-8');
+        res.end('Failed to connect to Outreach', 'utf-8');
     }
 };
 
@@ -86,12 +86,11 @@ const _requestAccessAndRefreshTokens = async (code) => {
 
     // TODO Get accesstoken and refreshtoken with the code
     const { data } = await post(
-        'https://api.outreach-staging.com/oauth/token',
+        `${process.env.OUTREACH_LOGIN_URL}/oauth/token`,
         {
-            client_id: 'HyZZJGyA5IqkrVVIhNN5Zd5GZ3e4dz7uPHsw9OHwa8Bm',
-            client_secret: '}ZkTXu?fdk**3H-!Mt7/F]omDu@Oage1@K{Ns.B`qfT',
-            redirect_uri:
-                'https://5a0b-125-17-251-66.ngrok-free.app/oauthcallback',
+            client_id: process.env.OUTREACH_CLIENT_ID,
+            client_secret: process.env.OUTREACH_CLIENT_SECRET,
+            redirect_uri: process.env.OUTREACH_CALLBACK_URL,
             grant_type: 'authorization_code',
             code: code
         }

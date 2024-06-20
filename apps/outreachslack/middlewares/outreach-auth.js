@@ -1,7 +1,6 @@
 'use strict';
 
 const { size } = require('lodash');
-// const UserToUserAuth = require("../salesforce/user-user-oauth");
 // const config = require("../config/config");
 const {
     querySlackAuthentication
@@ -67,31 +66,6 @@ const authWithOutreach = async ({
                 tokenCache.set(slackUserId, authInfo);
             }
         }
-        // If user is authorized, create/retrieve user to user connection
-        // if (context.hasAuthorized === true) {
-        //   console.log(
-        //     "Slack user is authorized! Connecting with user to user flow"
-        //   );
-        //   let userToUserConnection = {};
-        //   // Cache connection object for 10 minutes in the app
-        //   if (connectionCache.has(slackUserId)) {
-        //     userToUserConnection = connectionCache.get(slackUserId);
-        //   } else {
-        //     // Construct token object
-        //     const token = {
-        //       accessToken: authInfo.accessToken,
-        //       refreshToken: authInfo.refreshToken,
-        //     };
-        //     const userToUserAuth = new UserToUserAuth(
-        //       config.salesforce,
-        //       serverToServerConnection.instanceUrl, // Can we obtain this in a different way?
-        //       token
-        //     );
-        //     userToUserConnection = await userToUserAuth.connect();
-        //     connectionCache.set(slackUserId, userToUserConnection);
-        //   }
-        //   context.sfconnection = userToUserConnection;
-        // }
     } catch (e) {
         console.error(e);
         throw new Error(e.message);

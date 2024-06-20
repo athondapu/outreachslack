@@ -4,18 +4,6 @@ const chalk = require('chalk');
 
 const { userInputPrompt } = require('./deploy/get-user-input');
 const { setupHerokuApp } = require('./deploy/setup-heroku-app');
-// const {
-//     createScratchOrg,
-//     setupScratchOrg
-// } = require('./deploy/setup-salesforce-scratch-org');
-// const {
-//     setupNonScratchOrgUserContext,
-//     setupDefaultNonScratchOrg
-// } = require('./deploy/setup-salesforce-non-scratch-org');
-// const {
-//     createCertificate,
-//     prepareSfMetadata
-// } = require('./deploy/prepare-sf-metadata');
 
 const log = console.log;
 
@@ -31,21 +19,21 @@ sh.env.CURRENT_BRANCH = sh
     })
     .toString()
     .replace(/\n+$/, '');
-console.log("sh.env.CURRENT_BRANCH: ", sh.env.CURRENT_BRANCH);
-// sh.env.SF_USERNAME = '';
-// sh.env.SF_LOGIN_URL = '';
-sh.env.ORGID = '';
-// sh.env.CONSUMERKEY = '';
-// sh.env.PRIVATE_KEY = '';
+console.log("sh.env: ", sh.env);
 sh.env.HEROKU_APP_NAME = '';
 sh.env.SLACK_BOT_TOKEN = '';
 sh.env.SLACK_SIGNING_SECRET = '';
+sh.env.OUTREACH_LOGIN_URL = 'https://api.outreach-staging.com';
+sh.env.OUTREACH_CALLBACK_URL = 'https://outreachslack-7b6317175f29.herokuapp.com/oauthcallback';
+sh.env.OUTREACH_TOKEN_URL = 'https://api.outreach-staging.com/oauth/token';
+sh.env.OUTREACH_TASK_STAGING_API_URL = 'https://api.outreach-staging.com/api/v2/tasks';
+sh.env.OUTREACH_TASK_STAGING_WEB_URL = 'https://web.outreach-staging.com/tasks';
+sh.env.PORT = 7000;
 sh.env.HEROKU_URL = '';
 sh.env.OUTREACH_CLIENT_SECRET = '';
 sh.env.SLACK_APP_TOKEN = '';
 sh.env.AES_KEY = '';
 sh.env.HMAC_KEY = '';
-// sh.env.SALESFORCE_ENV_TYPE = '';
 
 (async () => {
     try {
@@ -53,21 +41,6 @@ sh.env.HMAC_KEY = '';
         sh.cd(sh.env.PROJECT_ROOT_DIR);
         // Ask user to input values needed for the deploy
         await getUserInput();
-        log('');
-        // Initialize Salesforce Org
-        // if (sh.env.SALESFORCE_ENV_TYPE == 'Scratch Org') {
-        //     await createScratchOrg();
-        // } else {
-        //     await setupNonScratchOrgUserContext();
-        // }
-        // const resultcert = await createCertificate();
-        // await prepareSfMetadata(resultcert.pubkey);
-        // // Set up Salesforce Org with metadata and data
-        // if (sh.env.SALESFORCE_ENV_TYPE == 'Scratch Org') {
-        //     await setupScratchOrg();
-        // } else {
-        //     await setupDefaultNonScratchOrg();
-        // }
         // Heroku Setup
         await setupHerokuApp();
     } catch (err) {
@@ -79,9 +52,10 @@ async function getUserInput() {
     log('');
     log(chalk.bold('*** Please provide the following information: '));
     const response = await userInputPrompt();
-    // sh.env.SF_DEV_HUB = response.devhub ?? '';
-    // sh.env.SF_SCRATCH_ORG = response.scratchorg ?? '';
     sh.env.HEROKU_APP_NAME = response['heroku-app'];
     sh.env.SLACK_BOT_TOKEN = response['slack-bot-token'];
     sh.env.SLACK_SIGNING_SECRET = response['slack-signing-secret'];
+    sh.env.OUTREACH_CLIENT_ID = response['outreach-client-id'];
+    sh.env.OUTREACH_CLIENT_SECRET = response['outreach-client-secret'];
+    sh.env.AES_KEY = response['aes-key'];
 }

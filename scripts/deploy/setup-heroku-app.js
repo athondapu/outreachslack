@@ -23,6 +23,8 @@ const setupHerokuApp = () => {
     const appNameCheck = sh.exec(`heroku apps:info ${sh.env.HEROKU_APP_NAME}`, {
         silent: true
     });
+    log(`App Name: ${sh.env.HEROKU_APP_NAME} and current branch: ${sh.env.CURRENT_BRANCH}`)
+    console.log("appNameCheck: ", appNameCheck);
     
     if (appNameCheck.stdout.includes(sh.env.HEROKU_APP_NAME)) {
         throw new Error(`App name already in use: ${sh.env.HEROKU_APP_NAME}`);
@@ -77,6 +79,12 @@ const setupHerokuApp = () => {
     );
     fs.appendFileSync('.env', 'AES_KEY=' + sh.env.AES_KEY + '\r\n');
     fs.appendFileSync('.env', 'HMAC_KEY=' + sh.env.HMAC_KEY + '\r\n');
+    fs.appendFileSync('.env', 'OUTREACH_LOGIN_URL=' + sh.env.OUTREACH_LOGIN_URL + '\r\n');
+    fs.appendFileSync('.env', 'OUTREACH_CALLBACK_URL=' + sh.env.OUTREACH_CALLBACK_URL + '\r\n');
+    fs.appendFileSync('.env', 'OUTREACH_TOKEN_URL=' + sh.env.OUTREACH_TOKEN_URL + '\r\n');
+    fs.appendFileSync('.env', 'OUTREACH_TASK_STAGING_API_URL=' + sh.env.OUTREACH_TASK_STAGING_API_URL + '\r\n');
+    fs.appendFileSync('.env', 'OUTREACH_TASK_STAGING_WEB_URL=' + sh.env.OUTREACH_TASK_STAGING_WEB_URL + '\r\n');
+    fs.appendFileSync('.env', 'PORT=' + sh.env.PORT + '\r\n');
     // fs.appendFileSync('.env', 'PRIVATE_KEY=' + privateKeyBase64Encode);
 
     log('*** Pushing app to Heroku');
@@ -99,6 +107,30 @@ const setupHerokuApp = () => {
     );
     sh.exec(
         `heroku config:set OUTREACH_CLIENT_ID=${sh.env.OUTREACH_CLIENT_ID} -a ${sh.env.HEROKU_APP_NAME}`,
+        { silent: true }
+    );
+    sh.exec(
+        `heroku config:set OUTREACH_LOGIN_URL=${sh.env.OUTREACH_LOGIN_URL} -a ${sh.env.HEROKU_APP_NAME}`,
+        { silent: true }
+    );
+    sh.exec(
+        `heroku config:set OUTREACH_CALLBACK_URL=${sh.env.OUTREACH_CALLBACK_URL} -a ${sh.env.HEROKU_APP_NAME}`,
+        { silent: true }
+    );
+    sh.exec(
+        `heroku config:set OUTREACH_TOKEN_URL=${sh.env.OUTREACH_TOKEN_URL} -a ${sh.env.HEROKU_APP_NAME}`,
+        { silent: true }
+    );
+    sh.exec(
+        `heroku config:set OUTREACH_TASK_STAGING_API_URL=${sh.env.OUTREACH_TASK_STAGING_API_URL} -a ${sh.env.HEROKU_APP_NAME}`,
+        { silent: true }
+    );
+    sh.exec(
+        `heroku config:set OUTREACH_TASK_STAGING_WEB_URL=${sh.env.OUTREACH_TASK_STAGING_WEB_URL} -a ${sh.env.HEROKU_APP_NAME}`,
+        { silent: true }
+    );
+    sh.exec(
+        `heroku config:set PORT=${sh.env.PORT} -a ${sh.env.HEROKU_APP_NAME}`,
         { silent: true }
     );
     sh.exec(

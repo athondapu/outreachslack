@@ -23,34 +23,6 @@ const generateUniqueAppName = (input) => {
     return name;
 };
 
-const getDefaultDevHub = () => {
-    const orgs = JSON.parse(
-        sh.exec('sf config get target-dev-hub --json', {
-            silent: true
-        })
-    );
-    if (orgs.result.length === 0) {
-        throw new Error(
-            'No default DevHub org configured. Please use "sf org login web --set-default-dev-hub" and authorize a Salesforce Developer org with DevHub Enabled'
-        );
-    }
-    return orgs.result[0].value;
-};
-
-const getDefaultOrg = () => {
-    const orgs = JSON.parse(
-        sh.exec('sf config get target-org --json', {
-            silent: true
-        })
-    );
-    if (orgs.result.length === 0) {
-        throw new Error(
-            'No default Org configured. Please use "sf org login web --set-default" and authorize a Salesforce Developer org'
-        );
-    }
-    return orgs.result[0].value;
-};
-
 const getRandomNumber = (length) => {
     return Math.floor(
         Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1)
@@ -68,23 +40,6 @@ const getRandomString = (length) => {
         );
     }
     return result;
-};
-
-const assignPermissionset = async () => {
-    // Assign permission set to user
-    const assignPermissionset = JSON.parse(
-        sh.exec(
-            `sf org assign permset -n Salesforce_Slack_App_Admin,Ready_to_Fly -o ${sh.env.SF_USERNAME} --json`,
-            { silent: true }
-        )
-    );
-
-    if (!assignPermissionset.result.successes) {
-        console.error(
-            'Permission set assignment failed - try again later: ' +
-                JSON.stringify(assignPermissionset)
-        );
-    }
 };
 
 const loadSampleData = async () => {
@@ -105,10 +60,7 @@ const loadSampleData = async () => {
 };
 
 module.exports = {
-    assignPermissionset,
     generateUniqueAppName,
-    getDefaultDevHub,
-    getDefaultOrg,
     getRandomNumber,
     getRandomString,
     loadSampleData,

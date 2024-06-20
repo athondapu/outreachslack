@@ -1,51 +1,12 @@
-const { prompt, Select } = require('enquirer');
-const sh = require('shelljs');
-const {
-    validateAppName,
-    getDefaultDevHub,
-    getDefaultOrg,
-    generateUniqueAppName
-} = require('./util');
+const { prompt } = require('enquirer');
+const { validateAppName, generateUniqueAppName } = require('./util');
 
 const userInputPrompt = async () => {
-    // const selectSfOrgType = new Select({
-    //     name: 'sfOrg',
-    //     message: 'Select Salesforce Development Environment',
-    //     choices: ['Non-Scratch Org', 'Scratch Org']
-    // });
-    // const selectedSfOrgType = await selectSfOrgType.run();
-    // sh.env.SALESFORCE_ENV_TYPE = selectedSfOrgType;
     const basicInfo = await promptBasicInfo();
     return basicInfo;
 };
 
 const promptBasicInfo = async () => {
-    // let sfdxInputs = [];
-    // if (selectedSfOrgType == 'Scratch Org') {
-    //     sfdxInputs = [
-    //         {
-    //             type: 'input',
-    //             name: 'devhub',
-    //             message: 'Existing DevHub Org CLI Alias',
-    //             initial: getDefaultDevHub
-    //         },
-    //         {
-    //             type: 'input',
-    //             name: 'scratchorg',
-    //             message: 'Scratch Org CLI Alias',
-    //             initial: 'scratchorg'
-    //         }
-    //     ];
-    // } else {
-    //     sfdxInputs = [
-    //         {
-    //             type: 'input',
-    //             name: 'defaultusername',
-    //             message: 'Existing Default Org CLI Alias',
-    //             initial: getDefaultOrg
-    //         }
-    //     ];
-    // }
     return (response = await prompt([
         {
             type: 'input',
@@ -64,7 +25,21 @@ const promptBasicInfo = async () => {
             name: 'slack-signing-secret',
             message: 'Slack Signing Secret'
         },
-        // ...sfdxInputs
+        {
+            type: 'password',
+            name: 'outreach-client-id',
+            message: 'Outreach Client ID'
+        },
+        {
+            type: 'password',
+            name: 'outreach-client-secret',
+            message: 'Outreach Client Secret'
+        },
+        {
+            type: 'password',
+            name: 'aes-key',
+            message: 'AES Key'
+        }
     ]));
 };
 

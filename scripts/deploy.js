@@ -42,6 +42,7 @@ sh.env.HMAC_KEY = '';
         // Ask user to input values needed for the deploy
         await getUserInput();
         // Heroku Setup
+        console.log("sh.env: ", sh.env);
         await setupHerokuApp();
     } catch (err) {
         log(chalk.bold.red(`*** ERROR: ${err}`));

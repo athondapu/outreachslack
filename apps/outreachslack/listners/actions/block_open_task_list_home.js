@@ -6,6 +6,7 @@ const openTaskCheckboxClickedCallback = async ({
   client,
   body,
 }) => {
+  console.log("openTaskCheckboxClickedCallback: ", action);
   await ack();
   if (action.selected_options.length > 0) {
     const tasksToUpdate = action.selected_options.map(

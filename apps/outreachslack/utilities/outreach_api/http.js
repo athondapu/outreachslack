@@ -3,12 +3,12 @@ const bearerToken = process.env.OUTREACH_BEARER_TOKEN;
 const { getDecryptedAccessToken } = require('../utils');
 const Get = async (url, slackUserId) => {
     const { accessToken, tokenType } = getDecryptedAccessToken(slackUserId);
-    // console.log("accessToken: ", accessToken);
+    console.log("accessToken: ", accessToken);
     // console.log("tokenType: ", tokenType);
     const response = await fetch(url, {
         headers: new Headers({
-            // Authorization: `${tokenType} ${accessToken}`,
-            Authorization: bearerToken,
+            Authorization: `${tokenType} ${accessToken}`,
+            // Authorization: bearerToken,
             'Content-Type': 'application/json'
         })
     });

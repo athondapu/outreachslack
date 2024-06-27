@@ -7,6 +7,8 @@ const { authWithOutreach } = require('../middlewares/outreach-auth');
 const { post } = require('../utilities/axiosHttp');
 const { reloadAppHome } = require('../utilities');
 const persistedClient = require('../store/bolt-web-client');
+const { default: axios } = require('axios');
+const qs = require('qs');
 
 const fetchOAuthToken = async (req, res) => {
     console.log('Executing user to user OAuth callback');
@@ -84,17 +86,38 @@ const fetchOAuthToken = async (req, res) => {
 const _requestAccessAndRefreshTokens = async (code) => {
     console.log('Code: ', code);
 
-    // TODO Get accesstoken and refreshtoken with the code
-    const { data } = await post(
-        `${process.env.OUTREACH_LOGIN_URL}/oauth/token`,
+    const formData = {
+        client_id: process.env.OUTREACH_CLIENT_ID,
+        client_secret: process.env.OUTREACH_CLIENT_SECRET,
+        redirect_uri: process.env.OUTREACH_CALLBACK_URL,
+        grant_type: 'authorization_code',
+        code: code
+    };
+
+    const formattedData = qs.stringify(formData);
+    console.log('formattedData: ', formattedData);
+
+    const { data } = await axios.post(
+        `${process.env.OUTREACH_LOGIN_URL}/connect/token`,
+        formattedData,
         {
-            client_id: process.env.OUTREACH_CLIENT_ID,
-            client_secret: process.env.OUTREACH_CLIENT_SECRET,
-            redirect_uri: process.env.OUTREACH_CALLBACK_URL,
-            grant_type: 'authorization_code',
-            code: code
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
         }
     );
+
+    // TODO Get accesstoken and refreshtoken with the code
+    // const { data } = await post(
+    //     `${process.env.OUTREACH_LOGIN_URL}/connect/token`,
+    //     {
+    //         client_id: process.env.OUTREACH_CLIENT_ID,
+    //         client_secret: process.env.OUTREACH_CLIENT_SECRET,
+    //         redirect_uri: process.env.OUTREACH_CALLBACK_URL,
+    //         grant_type: 'authorization_code',
+    //         code: code
+    //     }
+    // );
 
     console.log('response: ', data);
     const { access_token, refresh_token, token_type } = data;

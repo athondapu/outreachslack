@@ -23,6 +23,10 @@ const getOwnerIdFilter = (owner_id) => {
   return `filter[owner][id]=${owner_id}`;
 };
 
+const pageLimit = (limit) => {
+  return `page[limit]=${limit}`;
+};
+
 const getTaskURL = () => {
   return 'https://api.outreach-staging.com/api/v2/tasks';
 }
@@ -34,5 +38,6 @@ module.exports = {
   getSkippedTaskFilter,
   getDueAtFilter,
   getOwnerIdFilter,
-  getTaskURL
+  getTaskURL,
+  pageLimit
 };

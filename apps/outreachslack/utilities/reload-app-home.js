@@ -15,6 +15,7 @@ const {
     Get
 } = require('./outreach_api');
 const { join, concat } = require('lodash');
+const { pageLimit } = require('./outreach_api/tasks');
 
 const getTasks = async (view, slackUserId) => {
     const { state } = view;
@@ -49,7 +50,8 @@ const getTasks = async (view, slackUserId) => {
 
             // Load generic filters
             if (type) {
-                filters.push(getOwnerIdFilter(1640));
+                // filters.push(getOwnerIdFilter(1640));
+                filters.push(pageLimit(20));
             }
             if (filters.length > 0) {
                 const queryString = join(filters, '&');
@@ -76,10 +78,10 @@ const reloadAppHome = async (context, client, body, slackUserId) => {
                 });
                 return;
             }
-
+            const openTasks = openTasksView(size(tasks) > 0 ? tasks : [])
             await client.views.publish({
                 user_id: slackUserID,
-                view: openTasksView(size(tasks) > 0 ? tasks : [])
+                view: openTasks
             });
         } else {
             publishAuthScreen(client, slackUserId);

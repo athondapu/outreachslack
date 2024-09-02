@@ -1,0 +1,220 @@
+{
+    "display_information": {
+        "name": "outreach (local)",
+        "description": "A template for building Slack apps with Deno",
+        "background_color": "#5951ff"
+    },
+    "features": {
+        "app_home": {
+            "home_tab_enabled": true,
+            "messages_tab_enabled": true,
+            "messages_tab_read_only_enabled": false
+        },
+        "bot_user": {
+            "display_name": "outreach (local)",
+            "always_online": true
+        },
+        "slash_commands": [
+            {
+                "command": "/new",
+                "url": "https://0dbc-125-17-251-66.ngrok-free.app/ping111",
+                "description": "This is a new ping test command",
+                "should_escape": false
+            }
+        ]
+    },
+    "oauth_config": {
+        "redirect_urls": [
+            "https://outreachslack-ded9f08f331c.herokuapp.com/oauthcallback",
+            "https://871e-125-17-251-66.ngrok-free.app/oauthcallback"
+        ],
+        "scopes": {
+            "user": [
+                "channels:read",
+                "pins:read",
+                "users:read"
+            ],
+            "bot": [
+                "app_mentions:read",
+                "channels:history",
+                "channels:join",
+                "channels:read",
+                "chat:write",
+                "chat:write.public",
+                "commands",
+                "conversations.connect:manage",
+                "datastore:read",
+                "datastore:write",
+                "groups:history",
+                "groups:read",
+                "im:history",
+                "im:read",
+                "im:write",
+                "mpim:history",
+                "mpim:read",
+                "pins:read",
+                "triggers:write",
+                "users.profile:read",
+                "users:read",
+                "channels:manage"
+            ]
+        }
+    },
+    "settings": {
+        "event_subscriptions": {
+            "user_events": [
+                "channel_archive",
+                "channel_created",
+                "channel_rename",
+                "pin_added",
+                "pin_removed",
+                "team_join",
+                "user_status_changed"
+            ],
+            "bot_events": [
+                "app_home_opened",
+                "channel_created",
+                "channel_deleted",
+                "channel_rename",
+                "message.channels",
+                "message.groups",
+                "message.im",
+                "message.mpim",
+                "pin_added",
+                "pin_removed"
+            ]
+        },
+        "interactivity": {
+            "is_enabled": true,
+            "request_url": "https://8ff0-2405-201-c007-9cab-a989-f65f-bec4-3d9b.ngrok-free.app/slack/interactions"
+        },
+        "org_deploy_enabled": true,
+        "socket_mode_enabled": true,
+        "token_rotation_enabled": false,
+        "hermes_app_type": "local",
+        "function_runtime": "local"
+    },
+    "functions": {
+        "sample_function": {
+            "title": "Sample function",
+            "description": "A sample function",
+            "input_parameters": {
+                "message": {
+                    "type": "string",
+                    "title": "Message",
+                    "description": "Message to be posted",
+                    "is_required": true,
+                    "name": "message"
+                },
+                "user": {
+                    "type": "slack#/types/user_id",
+                    "title": "User",
+                    "description": "The user invoking the workflow",
+                    "is_required": true,
+                    "name": "user"
+                }
+            },
+            "output_parameters": {
+                "updatedMsg": {
+                    "type": "string",
+                    "title": "Updated Msg",
+                    "description": "Updated message to be posted",
+                    "is_required": true,
+                    "name": "updatedMsg"
+                }
+            }
+        }
+    },
+    "workflows": {
+        "sample_workflow": {
+            "title": "Sample workflow",
+            "description": "A sample workflow",
+            "input_parameters": {
+                "interactivity": {
+                    "type": "slack#/types/interactivity",
+                    "title": "Interactivity",
+                    "description": "",
+                    "is_required": true,
+                    "name": "interactivity"
+                },
+                "channel": {
+                    "type": "slack#/types/channel_id",
+                    "title": "Channel",
+                    "description": "",
+                    "is_required": true,
+                    "name": "channel"
+                },
+                "user": {
+                    "type": "slack#/types/user_id",
+                    "title": "User",
+                    "description": "",
+                    "is_required": true,
+                    "name": "user"
+                }
+            },
+            "steps": [
+                {
+                    "id": "0",
+                    "function_id": "slack#/functions/open_form",
+                    "inputs": {
+                        "title": "Send message to channel",
+                        "fields": {
+                            "elements": [
+                                {
+                                    "name": "channel",
+                                    "type": "slack#/types/channel_id",
+                                    "title": "Channel to send message to",
+                                    "default": "{{inputs.channel}}"
+                                },
+                                {
+                                    "long": true,
+                                    "name": "message",
+                                    "type": "string",
+                                    "title": "Message"
+                                }
+                            ],
+                            "required": [
+                                "channel",
+                                "message"
+                            ]
+                        },
+                        "submit_label": "Send message",
+                        "interactivity": "{{inputs.interactivity}}"
+                    }
+                },
+                {
+                    "id": "1",
+                    "function_id": "#/functions/sample_function",
+                    "inputs": {
+                        "user": "{{inputs.user}}",
+                        "message": "{{steps.0.fields.message}}"
+                    }
+                },
+                {
+                    "id": "2",
+                    "function_id": "slack#/functions/send_message",
+                    "inputs": {
+                        "message": "{{steps.1.updatedMsg}}",
+                        "channel_id": "{{steps.0.fields.channel}}"
+                    }
+                }
+            ]
+        }
+    },
+    "datastores": {
+        "SampleObjects": {
+            "primary_key": "object_id",
+            "attributes": {
+                "object_id": {
+                    "type": "string"
+                },
+                "original_msg": {
+                    "type": "string"
+                },
+                "updated_msg": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

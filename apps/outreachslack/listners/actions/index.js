@@ -20,6 +20,7 @@ const {
   appHomeTaskStartChannelModalCallback,
 } = require("./channels/block-app-home-task-start-channel");
 const { appHomeAuthorizeButtonCallback } = require("./app-home-authorize-btn");
+const { blockViewEmailTaskHomeCallback } = require("./block_view_email_task_home");
 
 module.exports.register = (app) => {
   app.action(
@@ -53,6 +54,14 @@ module.exports.register = (app) => {
       type: "block_actions",
     },
     openTaskCheckboxClickedCallback
+  );
+
+  app.action(
+    {
+      action_id: "app-home-task-overflow-view-email-content",
+      type: "block_actions",
+    },
+    blockViewEmailTaskHomeCallback
   );
 
   app.action(

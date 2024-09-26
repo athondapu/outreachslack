@@ -21,11 +21,12 @@ const Get = async (url, slackUserId) => {
     return { data: await response.json(), error: null };
 };
 
-const Post = async (url, body) => {
+const Post = async (url, body, slackUserId) => {
+    const { accessToken, tokenType } = getDecryptedAccessToken(slackUserId);
     const response = await fetch(url, {
         method: 'POST',
         headers: new Headers({
-            Authorization: bearerToken,
+            Authorization: `${tokenType} ${accessToken}`,
             'Content-Type': 'application/json'
         }),
         body: JSON.stringify(body)
@@ -79,10 +80,16 @@ const Delete = async (url) => {
     return { data: response.json(), error: null };
 };
 
-const MarkComplete = async (id) => {
+const MarkComplete = async (id, slackUserId) => {
     const url = `${process.env.OUTREACH_TASK_STAGING_API_URL}/${id}/actions/markComplete`;
     console.log('url: ', url);
-    return await Post(url, {});
+    return await Post(url, {}, slackUserId);
+};
+
+const LoadMailing = async (mailingId, slackUserId) => {
+    const url = `https://api.outreach-staging.com/api/v2/mailings/${mailingId}`;
+    console.log('url: ', url);
+    return await Get(url, slackUserId);
 };
 
 module.exports = {
@@ -90,5 +97,6 @@ module.exports = {
     Post,
     Put,
     Delete,
-    MarkComplete
+    MarkComplete,
+    LoadMailing
 };

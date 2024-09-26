@@ -1,5 +1,5 @@
 const getOpenTaskFilter = () => {
-  return "filter[state]=incomplete";
+  return "filter[state]=incomplete&&filter[owner][id]=1640";
 };
 
 const getClosedTaskFilter = () => {

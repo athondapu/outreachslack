@@ -31,7 +31,7 @@ const appHomeTaskStartChannelCallback = async ({ body, ack, client }) => {
     } = actions[0];
 
     if (text === MARK_COMPLETE) {
-      const { errors, data } = await MarkComplete(value);
+      const { errors, data } = await MarkComplete(value, body.user.id);
       console.log("errors: ", errors);
       console.log("Data: ", data);
       if (errors && size(errors) > 0) {

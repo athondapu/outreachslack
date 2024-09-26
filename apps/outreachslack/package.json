@@ -23,7 +23,8 @@
     "luxon": "^3.4.4",
     "node-cache": "^5.1.2",
     "pluralize": "^8.0.0",
-    "slack-block-builder": "^2.8.0"
+    "slack-block-builder": "^2.8.0",
+    "turndown": "^7.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.3"

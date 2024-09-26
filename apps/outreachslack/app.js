@@ -84,6 +84,45 @@ boltApp.use(authWithOutreach);
 //     next();
 // });
 
+// // Listen for messages in public channels
+// boltApp.event('message', async (payload) => {
+//     const { event, client, message } = payload;
+//     console.log("IN Middleware message: ", payload);
+//     const { text } = message;
+//     // try {
+//     //   // Send a message with buttons in response to every message in a channel
+//     //   await client.chat.postMessage({
+//     //     channel: event.channel,
+//     //     text: text,
+//     //     blocks: [
+//     //       {
+//     //         type: "section",
+//     //         text: {
+//     //           type: "mrkdwn",
+//     //           text: text
+//     //         },
+//     //       },
+//     //       {
+//     //         type: "actions",
+//     //         elements: [
+//     //           {
+//     //             type: "button",
+//     //             text: {
+//     //               type: "plain_text",
+//     //               text: "Click Me"
+//     //             },
+//     //             action_id: "button_click",
+//     //             value: "clicked"
+//     //           }
+//     //         ]
+//     //       }
+//     //     ]
+//     //   });
+//     // } catch (error) {
+//     //   console.error(error);
+//     // }
+//   });
+
 // Asynchronous function to start the app
 (async () => {
     const port = process.env.PORT || 3000;

@@ -2,6 +2,8 @@ const CREATE_TASK = "Create Task";
 const UPDATE_TASK = "Update Task";
 const DELETE_TASK = "Delete Task";
 const MARK_COMPLETE = "Mark Complete";
+const SEND_AND_COMPLETE = "Send & Complete";
+const VIEW_EMAIL_CONTENT = "View";
 const OPEN_TASKS = "Open Tasks";
 const COMPLETED_TASKS = "Completed Tasks";
 const START_CHANNEL = "Start Channel"
@@ -12,6 +14,7 @@ module.exports = {
   UPDATE_TASK,
   DELETE_TASK,
   MARK_COMPLETE,
+  VIEW_EMAIL_CONTENT,
   OPEN_TASKS,
   COMPLETED_TASKS,
   START_CHANNEL,

@@ -4,4 +4,5 @@ module.exports = {
   newChannel: require('./new-channel'),
   channelCreated: require('./channel-created'),
   channelCreationError: require('./channel-creation-error'),
+  mailSent: require('./success-model'),
 };

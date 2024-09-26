@@ -6,6 +6,15 @@ const slackIdVsProfile = {};
 const slackIdVsAuthInfo = {};
 const channelNameVsTask = {};
 const channelIdVsTask = {};
+const taskIdVsMailingInfo = {};
+
+const popultaeTaskIdVsMailingInfo = (taskId, mailingInfo) => {
+    taskIdVsMailingInfo[taskId] = mailingInfo
+}
+
+const getMailingInfoByTaskId = (taskId) => {
+    return taskIdVsMailingInfo[taskId];
+};
 
 const popultaeChannelNameVsTask = (channelName, channelId, taskInfo) => {
     channelIdVsTask[channelId] = taskInfo
@@ -63,5 +72,7 @@ module.exports = {
     getAuthInfo,
     getDecryptedAccessToken,
     popultaeChannelNameVsTask,
-    getTaskId
+    getTaskId,
+    popultaeTaskIdVsMailingInfo,
+    getMailingInfoByTaskId
 };

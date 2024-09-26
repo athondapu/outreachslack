@@ -1,6 +1,6 @@
 const { Modal, Blocks, Elements } = require('slack-block-builder');
 
-module.exports = (subject, markDown) => {
+module.exports = (subject, markDown, taskId) => {
     return Modal({ title: 'Email Modal' })
         .callbackId('email-modal')
         .blocks(
@@ -27,26 +27,11 @@ module.exports = (subject, markDown) => {
                     .placeholder('Enter your message')
             )
         )
+        .privateMetaData(
+            JSON.stringify({
+                taskId: taskId // Include extra data here
+            })
+        )
         .submit('Send')
         .buildToObject();
-
-    // return Modal({
-    //   title: "View Email",
-    //   submit: "Create",
-    //   callbackId: "email_modal",
-    // })
-    //   .blocks(
-    //     Blocks.Input({ label: "New channel", blockId: "channelName" }).element(
-    //       textInput(prefilledTitle)
-    //     ),
-    //     Blocks.Input({
-    //       label: "Assign users",
-    //       blockId: "channelAssignUsers",
-    //     }).element(
-    //       Elements.UserMultiSelect({
-    //         actionId: "channelAssignUsers",
-    //       })
-    //     )
-    //   )
-    //   .buildToJSON();
 };

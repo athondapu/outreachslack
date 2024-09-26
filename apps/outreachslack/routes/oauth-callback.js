@@ -119,7 +119,7 @@ const _requestAccessAndRefreshTokens = async (code) => {
     //     }
     // );
 
-    console.log('response: ', data);
+    // console.log('response: ', data);
     const { access_token, refresh_token, token_type } = data;
 
     return {

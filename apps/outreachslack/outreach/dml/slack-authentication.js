@@ -4,7 +4,7 @@ const config = require('../../config/config');
 const { addAuthInfo } = require('../../utilities/utils');
 
 const upsert = async (connection, slackUserId, outreachUserId) => {
-    console.log('connection: ', connection);
+    // console.log('connection: ', connection);
     try {
         const encryptedAccessToken = CryptoJS.AES.encrypt(
             connection.accessToken,

@@ -127,7 +127,7 @@ module.exports = (openTasks) => {
     const openTaskList = openTasks.map((task) => {
         const { attributes, relationships } = task;
         let { id } = task;
-        // console.log('task: ', task);
+        console.log('task: ', JSON.stringify(task));
         // console.log("relationships: ", relationships);
         const { note, title, dueAt, action } = attributes;
         const { mailing } = relationships;
@@ -196,7 +196,7 @@ module.exports = (openTasks) => {
                     )
                     .primary(true),
                 Elements.Button({ text: START_CHANNEL })
-                    .value(`${id}`)
+                    .value(JSON.stringify({id: `${id}`, note, title}))
                     .actionId('app-home-task-overflow-start-channel'),
                 Elements.Button({ text: OPEN_TASK })
                     .value(OPEN_TASK)

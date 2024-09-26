@@ -1,10 +1,14 @@
 const { size } = require("lodash");
 const { channelModals } = require("../../user-interface/modals");
+const { popultaeChannelNameVsTask } = require("../../utilities/utils");
 
-const newChannelModalCallback = async ({ ack, view, body, client }) => {
+const newChannelModalCallback = async (payload) => {
+  const { ack, view, body, client } = payload;
+  console.log("Payload in start channel modal: ", JSON.stringify(view));
   const providedValues = view.state.values;
 
   const channelName = providedValues.channelName.channelName.value;
+  const taskId = providedValues.taskId.taskId.value;
 
   const selectedUsers =
     providedValues.channelAssignUsers.channelAssignUsers.selected_users;
@@ -47,6 +51,7 @@ const newChannelModalCallback = async ({ ack, view, body, client }) => {
       channel: body.user.id,
       text: `Channel <#${channelId}> created and users invited successfully!`,
     });
+    popultaeChannelNameVsTask(channelName, channelId, {id: taskId});
     await ack({
       response_action: "update",
       view: channelModals.channelCreated(channelName),

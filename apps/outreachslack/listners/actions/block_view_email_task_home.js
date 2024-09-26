@@ -1,3 +1,4 @@
+const emailView = require('../../user-interface/modals/email/email-view');
 const { reloadAppHome, completeTasks } = require('../../utilities');
 const { LoadMailing } = require('../../utilities/outreach_api/http');
 const TurndownService = require('turndown');
@@ -10,7 +11,7 @@ const blockViewEmailTaskHomeCallback = async (payload) => {
     await ack();
     const { value } = action;
     const mailingResult = await LoadMailing(value, body.user.id);
-    console.log('mailingResult: ', mailingResult);
+    console.log('mailingResult: ', JSON.stringify(mailingResult));
     if (mailingResult) {
         const {
             data: { data: res }
@@ -20,78 +21,85 @@ const blockViewEmailTaskHomeCallback = async (payload) => {
         console.log('attributes: ', attributes);
         let markDown = turndownService.turndown(bodyHtml);
         // Further customizations for Slack's mrkdwn syntax
-        markDown = markDown.replace(/\[(.*?)\]\((.*?)\)/g, '<$2|$1>');  // Convert links to Slack format
+        markDown = markDown.replace(/\[(.*?)\]\((.*?)\)/g, '<$2|$1>'); // Convert links to Slack format
         markDown = markDown.replace(/\n\s*\n/g, '\n\n');
 
+        console.log("Email View: ", emailView)
+        // Open the modal using the Slack client
         await client.views.open({
             trigger_id: body.trigger_id,
-            view: {
-                type: 'modal',
-                callback_id: 'email_modal',
-                title: {
-                    type: 'plain_text',
-                    text: 'Email Modal'
-                },
-                blocks: [
-                    {
-                        type: 'input',
-                        block_id: 'email_input',
-                        element: {
-                            type: 'plain_text_input',
-                            action_id: 'email',
-                            initial_value: 'amar.thondapu@outreach.io',
-                            placeholder: {
-                                type: 'plain_text',
-                                text: 'Enter your email'
-                            }
-                        },
-                        label: {
-                            type: 'plain_text',
-                            text: 'Email'
-                        }
-                    },
-                    {
-                        type: 'input',
-                        block_id: 'subject_input',
-                        element: {
-                            type: 'plain_text_input',
-                            action_id: 'subject',
-                            initial_value: subject,
-                            placeholder: {
-                                type: 'plain_text',
-                                text: 'Subject of the email'
-                            }
-                        },
-                        label: {
-                            type: 'plain_text',
-                            text: 'Subject'
-                        }
-                    },
-                    {
-                        type: 'input',
-                        block_id: 'message_input',
-                        element: {
-                            type: 'plain_text_input',
-                            action_id: 'message',
-                            multiline: true,
-                            initial_value: markDown,
-                            placeholder: {
-                                type: 'plain_text',
-                                text: 'Enter your message'
-                            }
-                        },
-                        label: {
-                            type: 'plain_text',
-                            text: 'Message'
-                        }
-                    }
-                ],
-                submit: {
-                    type: 'plain_text',
-                    text: 'Send'
-                }
-            }
+            view: emailView(subject, markDown)
         });
+
+        // await client.views.open({
+        //     trigger_id: body.trigger_id,
+        //     view: {
+        //         type: 'modal',
+        //         callback_id: 'email_modal',
+        //         title: {
+        //             type: 'plain_text',
+        //             text: 'Email Modal'
+        //         },
+        //         blocks: [
+        //             {
+        //                 type: 'input',
+        //                 block_id: 'email_input',
+        //                 element: {
+        //                     type: 'plain_text_input',
+        //                     action_id: 'email',
+        //                     initial_value: 'amar.thondapu@outreach.io',
+        //                     placeholder: {
+        //                         type: 'plain_text',
+        //                         text: 'Enter your email'
+        //                     }
+        //                 },
+        //                 label: {
+        //                     type: 'plain_text',
+        //                     text: 'Email'
+        //                 }
+        //             },
+        //             {
+        //                 type: 'input',
+        //                 block_id: 'subject_input',
+        //                 element: {
+        //                     type: 'plain_text_input',
+        //                     action_id: 'subject',
+        //                     initial_value: subject,
+        //                     placeholder: {
+        //                         type: 'plain_text',
+        //                         text: 'Subject of the email'
+        //                     }
+        //                 },
+        //                 label: {
+        //                     type: 'plain_text',
+        //                     text: 'Subject'
+        //                 }
+        //             },
+        //             {
+        //                 type: 'input',
+        //                 block_id: 'message_input',
+        //                 element: {
+        //                     type: 'plain_text_input',
+        //                     action_id: 'message',
+        //                     multiline: true,
+        //                     initial_value: markDown,
+        //                     placeholder: {
+        //                         type: 'plain_text',
+        //                         text: 'Enter your message'
+        //                     }
+        //                 },
+        //                 label: {
+        //                     type: 'plain_text',
+        //                     text: 'Message'
+        //                 }
+        //             }
+        //         ],
+        //         submit: {
+        //             type: 'plain_text',
+        //             text: 'Send'
+        //         }
+        //     }
+        // });
     }
 };
 

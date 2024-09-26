@@ -1,6 +1,6 @@
 const { Modal, Blocks, Elements } = require("slack-block-builder");
 
-module.exports = (prefilledTitle, currentUser) => {
+module.exports = (prefilledTitle, currentUser, taskId) => {
   const textInput = (channelName) => {
     if (channelName) {
       return Elements.TextInput({
@@ -22,7 +22,16 @@ module.exports = (prefilledTitle, currentUser) => {
   })
     .blocks(
       Blocks.Input({ label: "New channel", blockId: "channelName" }).element(
-        textInput(prefilledTitle)
+        Elements.TextInput({
+          actionId: "channelName",
+          initialValue: ""
+        })
+      ),
+      Blocks.Input({ label: "Task ID", blockId: "taskId" }).element(
+        Elements.TextInput({
+          actionId: "taskId",
+          initialValue: String(taskId)
+        })
       ),
       Blocks.Input({
         label: "Assign users",

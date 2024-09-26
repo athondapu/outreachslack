@@ -61,6 +61,7 @@ const appHomeTaskMarkCompleteCallback = async (payload) => {
                 });
             }
         } else if (selectedText === START_CHANNEL) {
+          console.log("In start channel else block: ");
             await client.views.open({
                 trigger_id: body.trigger_id,
                 view: channelModals.newChannel(null, body.user.id)

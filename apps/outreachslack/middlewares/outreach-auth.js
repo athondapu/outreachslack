@@ -24,7 +24,7 @@ const authWithOutreach = async ({
     body,
     slackUserId
 } = {}) => {
-    console.log('Executing Outreach auth middleware:',context);
+    // console.log('Executing Outreach auth middleware:',context);
     if (!slackUserId) {
         // For all events Slack returns the users Id as user.id
         if (payload?.user?.id) {

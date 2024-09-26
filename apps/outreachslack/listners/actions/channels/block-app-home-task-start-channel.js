@@ -9,12 +9,17 @@ const { errorModal } = require("../../../exceptions/generic-exception");
 const { successModal } = require("../../../modals/success");
 const {channelModals} = require('../../../user-interface')
 
-const appHomeTaskStartChannelModalCallback = async ({ body, ack, client }) => {
+const appHomeTaskStartChannelModalCallback = async (payload) => {
   try {
+    const { body, ack, client, action } = payload;
     await ack();
+    console.log("In start channel: ", action);
+    const value = JSON.parse(action.value);
+    console.log("In start channel value: ", value);
+    const {id: taskID, note, title} = value;
     await client.views.open({
       trigger_id: body.trigger_id,
-      view: channelModals.newChannel(null, body.user.id),
+      view: channelModals.newChannel(null, body.user.id, taskID),
     });
   } catch (error) {
     // eslint-disable-next-line no-console

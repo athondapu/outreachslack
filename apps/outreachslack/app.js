@@ -8,7 +8,11 @@ const { fetchOAuthToken } = require('./routes/oauth-callback');
 const persistedClient = require('./store/bolt-web-client');
 const { authWithOutreach } = require('./middlewares/outreach-auth');
 const { startOAuthProcess } = require('./routes/oauth-start');
-const { registerMiddlewares } = require("./middlewares");
+const { registerMiddlewares } = require('./middlewares');
+const { getTaskId, getDecryptedAccessToken } = require('./utilities/utils');
+const { MarkComplete } = require('./utilities/outreach_api');
+const { size } = require('lodash');
+const { errorModal } = require('./exceptions/generic-exception');
 
 let logLevel;
 switch (process.env.LOG_LEVEL) {
@@ -50,8 +54,8 @@ app.get('/oauthcallback', async (req, res) => {
 });
 
 app.get('/oauthstart/:slackUserId', async (req, res) => {
-  console.log('in oauth start: ');
-  await startOAuthProcess(req, res);
+    console.log('in oauth start: ');
+    await startOAuthProcess(req, res);
 });
 
 // Initializes your app with your bot token and signing secret
@@ -84,44 +88,75 @@ boltApp.use(authWithOutreach);
 //     next();
 // });
 
-// // Listen for messages in public channels
-// boltApp.event('message', async (payload) => {
-//     const { event, client, message } = payload;
-//     console.log("IN Middleware message: ", payload);
-//     const { text } = message;
-//     // try {
-//     //   // Send a message with buttons in response to every message in a channel
-//     //   await client.chat.postMessage({
-//     //     channel: event.channel,
-//     //     text: text,
-//     //     blocks: [
-//     //       {
-//     //         type: "section",
-//     //         text: {
-//     //           type: "mrkdwn",
-//     //           text: text
-//     //         },
-//     //       },
-//     //       {
-//     //         type: "actions",
-//     //         elements: [
-//     //           {
-//     //             type: "button",
-//     //             text: {
-//     //               type: "plain_text",
-//     //               text: "Click Me"
-//     //             },
-//     //             action_id: "button_click",
-//     //             value: "clicked"
-//     //           }
-//     //         ]
-//     //       }
-//     //     ]
-//     //   });
-//     // } catch (error) {
-//     //   console.error(error);
-//     // }
-//   });
+// Listen for the slash command '/mycommand'
+boltApp.command('/completetask', async (payload) => {
+    // console.log('command payload: ', payload);
+    const { say, ack, respond, body } = payload;
+    // Acknowledge the command
+    await ack();
+    let { text: taskId, channel_id, user_id } = body;
+    if (!taskId) {
+        taskId = getTaskId(channel_id);
+    }
+    const { accessToken } = getDecryptedAccessToken(user_id);
+    if (!accessToken) {
+        await respond('You have to login before executing this command');
+    }
+
+    const { errors, data } = await MarkComplete(taskId, user_id);
+
+    console.log('errors: ', errors);
+    console.log('Data: ', data);
+    if (errors && size(errors) > 0) {
+        const errorBlocks = errors.map((error) => {
+            const { detail } = error;
+            return {
+                type: 'rich_text_list',
+                style: 'bullet',
+                elements: [
+                    {
+                        type: 'rich_text_section',
+                        elements: [
+                            {
+                                type: 'text',
+                                text: detail
+                            }
+                        ]
+                    }
+                ]
+            };
+        });
+        const json = {
+            blocks: [
+                {
+                    type: 'rich_text',
+                    elements: [
+                        {
+                            type: 'rich_text_section',
+                            elements: [
+                                {
+                                    type: 'text',
+                                    text: 'Please check the following errors'
+                                }
+                            ]
+                        },
+                        ...errorBlocks
+                    ]
+                }
+            ]
+        };
+        console.log(json);
+        // const errorJson = errorModal(json);
+        // Respond with the text that the user sent
+        await respond(json);
+    } else {
+        const { attributes } = data;
+        const { action } = attributes;
+        const successMessage = `The task *${taskId}* successfully marked as completed`;
+        // Respond with the text that the user sent
+        await respond(successMessage);
+    }
+});
 
 // Asynchronous function to start the app
 (async () => {
@@ -129,9 +164,7 @@ boltApp.use(authWithOutreach);
     try {
         // Start your app
         await boltApp.start(port);
-        console.log(
-            `⚡️ Bolt app is running on port ${port}!`
-        );
+        console.log(`⚡️ Bolt app is running on port ${port}!`);
     } catch (error) {
         console.error('Unable to start App', error);
         process.exit(1);

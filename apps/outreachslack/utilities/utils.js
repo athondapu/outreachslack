@@ -4,6 +4,17 @@ const config = require('../config/config');
 const slackIdVsOutreachUserId = {};
 const slackIdVsProfile = {};
 const slackIdVsAuthInfo = {};
+const channelNameVsTask = {};
+const channelIdVsTask = {};
+
+const popultaeChannelNameVsTask = (channelName, channelId, taskInfo) => {
+    channelIdVsTask[channelId] = taskInfo
+    channelNameVsTask[channelName] = taskInfo
+}
+
+const getTaskId = (channelId) => {
+    return channelIdVsTask[channelId];
+};
 
 const addUserId = (slackId, outreachUserId) => {
     slackIdVsOutreachUserId[slackId] = outreachUserId;
@@ -31,7 +42,8 @@ const getAuthInfo = (slackId) => {
 
 const getDecryptedAccessToken = (slackId) => {
     const authInfo = getAuthInfo(slackId);
-    console.log("authInfo access: ", authInfo.accessToken);
+    // console.log("authInfo access slackId: ", slackId);
+    // console.log("authInfo access: ", authInfo);
     if (authInfo) {
         const decryptedToken = CryptoJS.AES.decrypt(
             authInfo.accessToken,
@@ -39,7 +51,7 @@ const getDecryptedAccessToken = (slackId) => {
         ).toString(CryptoJS.enc.Utf8);
         return { accessToken: decryptedToken, tokenType: authInfo.tokenType };
     }
-    return { accessToken: authInfo.accessToken, tokenType: authInfo.tokenType };
+    return { accessToken: null, tokenType: null };
 };
 
 module.exports = {
@@ -49,5 +61,7 @@ module.exports = {
     getProfile,
     addAuthInfo,
     getAuthInfo,
-    getDecryptedAccessToken
+    getDecryptedAccessToken,
+    popultaeChannelNameVsTask,
+    getTaskId
 };

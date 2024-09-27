@@ -45,15 +45,17 @@ const Post = async (url, body, slackUserId) => {
     return { data, errors: null };
 };
 
-const Put = async (url, body) => {
+const Put = async (url, body, slackUserId) => {
+    const { accessToken, tokenType } = getDecryptedAccessToken(slackUserId);
     const response = await fetch(url, {
         method: 'PUT',
         headers: new Headers({
-            Authorization: bearerToken,
+            Authorization: `${tokenType} ${accessToken}`,
             'Content-Type': 'application/json'
         }),
         body: JSON.stringify(body)
     });
+    console.log("response: ", response);
 
     if (response.status != 200) {
         const body = await response.text();
@@ -92,11 +94,18 @@ const LoadMailing = async (mailingId, slackUserId) => {
     return await Get(url, slackUserId);
 };
 
+const UpdateNotes = async (id, slackUserId, notes) => {
+    const url = `${process.env.OUTREACH_TASK_STAGING_API_URL}/${id}/actions/updateNote?actionParams[note]=${notes}`;
+    console.log('url: ', url);
+    return await Post(url, {}, slackUserId);
+};
+
 module.exports = {
     Get,
     Post,
     Put,
     Delete,
     MarkComplete,
-    LoadMailing
+    LoadMailing,
+    UpdateNotes
 };

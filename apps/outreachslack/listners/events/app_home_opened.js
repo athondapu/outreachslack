@@ -1,7 +1,7 @@
 const { reloadAppHome } = require("../../utilities");
 
 const appHomeOpenedCallback = async ({ client, event, body, context }) => {
-  // console.log("event: ", event);
+  console.log("event: ", event);
   console.log("body: ", body);
   if (event.tab !== "home") {
     // Ignore the `app_home_opened` event for everything

@@ -18,7 +18,7 @@ const { join, concat } = require('lodash');
 const { pageLimit } = require('./outreach_api/tasks');
 
 const getTasks = async (view, slackUserId) => {
-    const { state } = view;
+    const { state } = view || {};
     console.log('State: ', state);
     const { values } = state || {};
     if (values && size(values) > 0) {

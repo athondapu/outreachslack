@@ -15,7 +15,7 @@ const {
 const appHomeTaskMarkCompleteCallback = async (payload) => {
     const reload = true;
     const { body, ack, client, context, event } = payload;
-    console.log('body: ', body);
+    console.log('payload: ', payload);
     const { actions, user } = body;
     const { type, selected_option } = actions[0];
     try {
@@ -61,7 +61,7 @@ const appHomeTaskMarkCompleteCallback = async (payload) => {
                 });
             }
         } else if (selectedText === START_CHANNEL) {
-          console.log("In start channel else block: ");
+            console.log('In start channel else block: ');
             await client.views.open({
                 trigger_id: body.trigger_id,
                 view: channelModals.newChannel(null, body.user.id)
@@ -70,8 +70,35 @@ const appHomeTaskMarkCompleteCallback = async (payload) => {
             reload = false;
             // Need to handle/add a new view to show the message.
         }
-        if (reload) {
+        if (event && reload) {
             await reloadAppHome(context, client, body, user.id);
+        } else if (!event) {
+            const { container: {channel_id, message_ts} } = body;
+            // const channelId = command.channel_id; // Channel ID where the message is
+            const ts = message_ts; // Timestamp of the message you want to update
+            const newText = [
+                {
+                    type: 'header',
+                    text: {
+                        type: 'plain_text',
+                        text: `:white_check_mark: Task ID (${selectedValue}) marked as completed successfully`,
+                        emoji: true
+                    }
+                }
+            ]; // New message text
+
+            try {
+                // Call the chat.update method to update the message
+                await client.chat.update({
+                    channel: channel_id,
+                    ts: ts,
+                    blocks: newText
+                });
+
+            } catch (error) {
+                console.error(error);
+                await respond(`Failed to update message: ${error.message}`);
+            }
         }
     } catch (error) {
         // eslint-disable-next-line no-console

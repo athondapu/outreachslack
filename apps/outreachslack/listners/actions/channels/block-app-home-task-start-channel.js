@@ -1,72 +1,76 @@
-const { Modal, Blocks, Elements } = require("slack-block-builder");
+const { Modal, Blocks, Elements } = require('slack-block-builder');
 const {
-  MARK_COMPLETE,
-  MarkComplete,
-} = require("../../../utilities/outreach_api");
-const reloadAppHome = require("../../../utilities/reload-app-home");
-const { size } = require("lodash");
-const { errorModal } = require("../../../exceptions/generic-exception");
-const { successModal } = require("../../../modals/success");
-const {channelModals} = require('../../../user-interface')
+    MARK_COMPLETE,
+    MarkComplete
+} = require('../../../utilities/outreach_api');
+const reloadAppHome = require('../../../utilities/reload-app-home');
+const { size } = require('lodash');
+const { errorModal } = require('../../../exceptions/generic-exception');
+const { successModal } = require('../../../modals/success');
+const { channelModals } = require('../../../user-interface');
 
 const appHomeTaskStartChannelModalCallback = async (payload) => {
-  try {
-    const { body, ack, client, action } = payload;
-    await ack();
-    console.log("In start channel: ", action);
-    const value = JSON.parse(action.value);
-    console.log("In start channel value: ", value);
-    const {id: taskID, note, title} = value;
-    await client.views.open({
-      trigger_id: body.trigger_id,
-      view: channelModals.newChannel(null, body.user.id, taskID),
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
+    try {
+        const { body, ack, client, action } = payload;
+        await ack();
+        console.log('In start channel: ', action);
+        const value = JSON.parse(action.value);
+        console.log('In start channel value: ', value);
+        let { id: taskID, note, title } = value;
+        if (!taskID) {
+            taskID = value;
+        }
+        console.log('In start channel value taskID: ', taskID);
+        await client.views.open({
+            trigger_id: body.trigger_id,
+            view: channelModals.newChannel(null, body.user.id, taskID)
+        });
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+    }
 };
 
 const appHomeTaskStartChannelCallback = async ({ body, ack, client }) => {
-  try {
-    await ack();
-    const {
-      text: { text },
-      value,
-    } = actions[0];
+    try {
+        await ack();
+        const {
+            text: { text },
+            value
+        } = actions[0];
 
-    if (text === MARK_COMPLETE) {
-      const { errors, data } = await MarkComplete(value, body.user.id);
-      console.log("errors: ", errors);
-      console.log("Data: ", data);
-      if (errors && size(errors) > 0) {
-        const errorJson = errorModal(errors);
-        await client.views.open({
-          trigger_id: body.trigger_id,
-          view: errorJson,
-        });
-      } else {
-        const { attributes } = data;
-        const { action } = attributes;
-        const successMessage = successModal([
-          `The current *${action}* task successfully marked as completed`,
-        ]);
-        await client.views.open({
-          trigger_id: body.trigger_id,
-          view: successMessage,
-        });
-      }
-    } else {
-      // Need to implement this case
+        if (text === MARK_COMPLETE) {
+            const { errors, data } = await MarkComplete(value, body.user.id);
+            console.log('errors: ', errors);
+            console.log('Data: ', data);
+            if (errors && size(errors) > 0) {
+                const errorJson = errorModal(errors);
+                await client.views.open({
+                    trigger_id: body.trigger_id,
+                    view: errorJson
+                });
+            } else {
+                const { attributes } = data;
+                const { action } = attributes;
+                const successMessage = successModal([
+                    `The current *${action}* task successfully marked as completed`
+                ]);
+                await client.views.open({
+                    trigger_id: body.trigger_id,
+                    view: successMessage
+                });
+            }
+        } else {
+            // Need to implement this case
+        }
+        await reloadAppHome(client, body, body.view.private_metadata);
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
     }
-    await reloadAppHome(client, body, body.view.private_metadata);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
 };
 
 module.exports = {
-  appHomeTaskStartChannelCallback,
-  appHomeTaskStartChannelModalCallback,
+    appHomeTaskStartChannelCallback,
+    appHomeTaskStartChannelModalCallback
 };

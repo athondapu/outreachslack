@@ -9,17 +9,17 @@ const channelIdVsTask = {};
 const taskIdVsMailingInfo = {};
 
 const popultaeTaskIdVsMailingInfo = (taskId, mailingInfo) => {
-    taskIdVsMailingInfo[taskId] = mailingInfo
-}
+    taskIdVsMailingInfo[taskId] = mailingInfo;
+};
 
 const getMailingInfoByTaskId = (taskId) => {
     return taskIdVsMailingInfo[taskId];
 };
 
 const popultaeChannelNameVsTask = (channelName, channelId, taskInfo) => {
-    channelIdVsTask[channelId] = taskInfo
-    channelNameVsTask[channelName] = taskInfo
-}
+    channelIdVsTask[channelId] = taskInfo;
+    channelNameVsTask[channelName] = taskInfo;
+};
 
 const getTaskId = (channelId) => {
     return channelIdVsTask[channelId];
@@ -63,6 +63,57 @@ const getDecryptedAccessToken = (slackId) => {
     return { accessToken: null, tokenType: null };
 };
 
+// Function to get user profile by user ID
+const getUserProfileByUserId = async (userId, client) => {
+    try {
+        const result = await client.users.info({
+            user: userId
+        });
+
+        // Extract and return user profile information
+        return result.user.profile;
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+    }
+};
+
+// Function to fetch user info by user ID
+const fetchUserNameById = async (userId, client) => {
+    try {
+        const result = await client.users.info({ user: userId });
+
+        // Return only the username or real name
+        return result.user.real_name; // You can also use `result.user.real_name` for the full name
+    } catch (error) {
+        console.error(`Failed to fetch user info for ${userId}:`, error);
+        return `<@${userId}>`; // Fallback in case of an error
+    }
+};
+
+// Function to replace user mentions in a message
+const replaceMentionsWithUsernames = async (messageText, client) => {
+    const mentionRegex = /<@(\w+)>/g; // Regex to find user mentions
+    let match;
+    const promises = [];
+
+    // Find all user mentions in the message text
+    while ((match = mentionRegex.exec(messageText)) !== null) {
+        const userId = match[1];
+        promises.push(fetchUserNameById(userId, client));
+    }
+
+    // Wait for all username fetches to complete
+    const usernames = await Promise.all(promises);
+
+    // Replace mentions with corresponding usernames
+    let replacedText = messageText;
+    let i = 0;
+    replacedText = replacedText.replace(mentionRegex, () => {
+        return `${usernames[i++]},`; // Replace with username
+    });
+    return replacedText;
+};
+
 module.exports = {
     addUserId,
     getOutreachUserId,
@@ -74,5 +125,7 @@ module.exports = {
     popultaeChannelNameVsTask,
     getTaskId,
     popultaeTaskIdVsMailingInfo,
-    getMailingInfoByTaskId
+    getMailingInfoByTaskId,
+    getUserProfileByUserId,
+    replaceMentionsWithUsernames
 };

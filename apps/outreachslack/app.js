@@ -9,10 +9,16 @@ const persistedClient = require('./store/bolt-web-client');
 const { authWithOutreach } = require('./middlewares/outreach-auth');
 const { startOAuthProcess } = require('./routes/oauth-start');
 const { registerMiddlewares } = require('./middlewares');
-const { getTaskId, getDecryptedAccessToken } = require('./utilities/utils');
+const {
+    getTaskId,
+    getDecryptedAccessToken,
+    getUserProfileByUserId,
+    replaceMentionsWithUsernames
+} = require('./utilities/utils');
 const { MarkComplete } = require('./utilities/outreach_api');
 const { size } = require('lodash');
 const { errorModal } = require('./exceptions/generic-exception');
+const { UpdateNotes } = require('./utilities/outreach_api/http');
 
 let logLevel;
 switch (process.env.LOG_LEVEL) {
@@ -88,6 +94,60 @@ boltApp.use(authWithOutreach);
 //     next();
 // });
 
+boltApp.command('/record', async (payload) => {
+    // console.log('record command payload: ', payload);
+    const { say, ack, client, body } = payload;
+    await ack();
+    let { channel_id, user_id } = body;
+    const allMessages = [];
+    let cursor;
+
+    try {
+        do {
+            const result = await client.conversations.history({
+                channel: channel_id,
+                cursor: cursor,
+                limit: 100 // Adjust the limit as needed
+            });
+
+            allMessages.push(...result.messages);
+            cursor = result.response_metadata.next_cursor; // Pagination
+        } while (cursor);
+
+        // Filter messages by date range
+        const userNameVsMsg = await Promise.all(
+            allMessages.map(async (message) => {
+                const { user, text } = message;
+                const { real_name } = await getUserProfileByUserId(
+                    user,
+                    client
+                );
+                const replacedText = await replaceMentionsWithUsernames(
+                    text,
+                    client
+                );
+                // console.log("replaced text: ", replacedText);
+                return { userName: real_name, msg: replacedText };
+            })
+        );
+        const notes = userNameVsMsg.map(entry => `${entry.userName}: ${entry.msg}`).join('\n\n');
+        console.log('notes: ', notes);
+
+        // Encode the multiline value for use in a URL
+        const encodedValue = encodeURIComponent(notes);
+
+        const { errors, data } = await UpdateNotes(306484, user_id, encodedValue)
+        console.log("errors: ", errors)
+        console.log("data: ", data)
+
+        // Sort messages in ascending order based on timestamp
+        // return filteredMessages.sort((a, b) => a.ts - b.ts);
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+});
+
 // Listen for the slash command '/mycommand'
 boltApp.command('/completetask', async (payload) => {
     // console.log('command payload: ', payload);
@@ -145,7 +205,7 @@ boltApp.command('/completetask', async (payload) => {
                 }
             ]
         };
-        console.log(json);
+        // console.log(json);
         // const errorJson = errorModal(json);
         // Respond with the text that the user sent
         await respond(json);
